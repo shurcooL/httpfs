@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shurcooL/go/vfs/httpfs/vfsutil"
+	"github.com/shurcooL/httpfs/vfsutil"
 )
 
 // New creates an union filesystem with the provided mapping of mount points to filesystems.

@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shurcooL/go/vfs/httpfs/vfsutil"
+	"github.com/shurcooL/httpfs/vfsutil"
 )
 
 const separator = "/"

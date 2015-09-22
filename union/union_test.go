@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/shurcooL/go/vfs/httpfs/union"
-	"github.com/shurcooL/go/vfs/httpfs/vfsutil"
+	"github.com/shurcooL/httpfs/union"
+	"github.com/shurcooL/httpfs/vfsutil"
 	"golang.org/x/tools/godoc/vfs/httpfs"
 	"golang.org/x/tools/godoc/vfs/mapfs"
 )

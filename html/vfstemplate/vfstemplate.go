@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/shurcooL/go/vfs/httpfs/path/vfspath"
-	"github.com/shurcooL/go/vfs/httpfs/vfsutil"
+	"github.com/shurcooL/httpfs/path/vfspath"
+	"github.com/shurcooL/httpfs/vfsutil"
 )
 
 // ParseFiles creates a new Template if t is nil and parses the template definitions from
