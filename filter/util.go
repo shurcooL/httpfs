@@ -10,7 +10,7 @@ import (
 func Extensions(exts ...string) Func {
 	return func(fi os.FileInfo, path string) bool {
 		for _, ext := range exts {
-			if filepath.Ext(ext) == ext {
+			if filepath.Ext(path) == ext {
 				return true
 			}
 		}
