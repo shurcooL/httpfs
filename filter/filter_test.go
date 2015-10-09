@@ -41,7 +41,7 @@ func Example() {
 			(fi.IsDir() && fi.Name() == "folder-to-skip")
 	}
 
-	fs = filter.NewIgnore(fs, ignore)
+	fs = filter.New(fs, ignore)
 
 	err := vfsutil.Walk(fs, "/", walk)
 	if err != nil {
