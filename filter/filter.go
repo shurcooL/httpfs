@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-// NewIgnore creates a filesystem that contains everything in source, except files for which
+// New creates a filesystem that contains everything in source, except files for which
 // ignore returns true.
 //
 // ignore func is provided two arguments, the os.FileInfo of the considered file, and its full absolute path.
-func NewIgnore(source http.FileSystem, ignore func(fi os.FileInfo, path string) bool) http.FileSystem {
+func New(source http.FileSystem, ignore func(fi os.FileInfo, path string) bool) http.FileSystem {
 	return &filterFS{source: source, ignore: ignore}
 }
 
