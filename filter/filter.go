@@ -23,6 +23,13 @@ type filterFS struct {
 	ignore func(fi os.FileInfo, path string) bool // Skip files that ignore returns true for.
 }
 
+// clean turns a potentially relative path into an absolute one.
+//
+// This is needed to normalize path parameter for ignore func.
+func (fs *filterFS) clean(path string) string {
+	return pathpkg.Clean("/" + path)
+}
+
 func (fs *filterFS) Open(path string) (http.File, error) {
 	f, err := fs.source.Open(path)
 	if err != nil {
@@ -35,7 +42,7 @@ func (fs *filterFS) Open(path string) (http.File, error) {
 		return nil, err
 	}
 
-	if fs.ignore(fi, path) {
+	if fs.ignore(fi, fs.clean(path)) {
 		// Skip.
 		f.Close()
 		return nil, &os.PathError{Op: "open", Path: path, Err: os.ErrNotExist}
@@ -53,7 +60,7 @@ func (fs *filterFS) Open(path string) (http.File, error) {
 
 	var entries []os.FileInfo
 	for _, fi := range fis {
-		if fs.ignore(fi, pathpkg.Join(path, fi.Name())) {
+		if fs.ignore(fi, fs.clean(pathpkg.Join(path, fi.Name()))) {
 			// Skip.
 			continue
 		}
