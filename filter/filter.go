@@ -13,7 +13,7 @@ import (
 // Func is a filtering function which is provided two arguments, the os.FileInfo
 // of the considered file, and its full absolute path. For example, if the considered file is
 // named "a" and it's inside a directory "dir", then the value of path will be "/dir/a".
-type Func func(fi os.FileInfo, path string) bool
+type Func func(path string, fi os.FileInfo) bool
 
 // New creates a filesystem that contains everything in source, except files for which
 // ignore returns true.
@@ -23,7 +23,7 @@ func New(source http.FileSystem, ignore Func) http.FileSystem {
 
 type filterFS struct {
 	source http.FileSystem
-	ignore func(fi os.FileInfo, path string) bool // Skip files that ignore returns true for.
+	ignore Func // Skip files that ignore returns true for.
 }
 
 // clean turns a potentially relative path into an absolute one.
@@ -45,7 +45,7 @@ func (fs *filterFS) Open(path string) (http.File, error) {
 		return nil, err
 	}
 
-	if fs.ignore(fi, fs.clean(path)) {
+	if fs.ignore(fs.clean(path), fi) {
 		// Skip.
 		f.Close()
 		return nil, &os.PathError{Op: "open", Path: path, Err: os.ErrNotExist}
@@ -63,7 +63,7 @@ func (fs *filterFS) Open(path string) (http.File, error) {
 
 	var entries []os.FileInfo
 	for _, fi := range fis {
-		if fs.ignore(fi, fs.clean(pathpkg.Join(path, fi.Name()))) {
+		if fs.ignore(fs.clean(pathpkg.Join(path, fi.Name())), fi) {
 			// Skip.
 			continue
 		}
