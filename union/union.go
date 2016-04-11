@@ -14,6 +14,7 @@ import (
 )
 
 // New creates an union filesystem with the provided mapping of mount points to filesystems.
+// For each mounted filesystem, it first does a stat of "/" to ensure it exists and to get its mod time.
 //
 // Each mount point must be of form "/mydir". It must start with a '/', and contain a single directory name.
 func New(mapping map[string]http.FileSystem) http.FileSystem {
@@ -35,9 +36,12 @@ type unionFS struct {
 	root *dirInfo
 }
 
-// bind mounts fs at mountPoint.
+// bind mounts fs at mountPoint, first doing a stat of "/" to ensure it exists and to get its mod time.
 // mountPoint must be of form "/mydir". It must start with a '/', and contain a single directory name.
 func (u *unionFS) bind(mountPoint string, fs http.FileSystem) {
+	// THINK: I assumed doing a stat of "/" in fs is a very fast operation, but what if it isn't?
+	//        Maybe shouldn't do it, rather trust caller to do it if needed. Consider what to do
+	//        about mod time, either drop it or do it lazily.
 	fi, err := vfsutil.Stat(fs, "/")
 	if err != nil {
 		log.Fatalln("can't stat root directory of provided filesystem:", err)
