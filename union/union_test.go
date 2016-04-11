@@ -67,7 +67,7 @@ func Example() {
 	// /fs1/sample-file.txt
 }
 
-func ExampleEmpty() {
+func Example_empty() {
 	empty := union.New(nil)
 
 	err := vfsutil.Walk(empty, "/", walk)
@@ -79,7 +79,7 @@ func ExampleEmpty() {
 	// /
 }
 
-func ExampleNotExist() {
+func Example_notExist() {
 	empty := union.New(nil)
 
 	_, err := empty.Open("/does-not-exist")
