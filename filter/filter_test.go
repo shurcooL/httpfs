@@ -36,12 +36,14 @@ func Example() {
 		"folder-to-skip":                   "This is a file, not a folder, and shouldn't be skipped.",
 	}))
 
-	ignore := func(_ string, fi os.FileInfo) bool {
+	// Skip files with .go and .html extensions, and directories named "folder-to-skip" (but
+	// not files named "folder-to-skip").
+	skip := func(_ string, fi os.FileInfo) bool {
 		return pathpkg.Ext(fi.Name()) == ".go" || pathpkg.Ext(fi.Name()) == ".html" ||
 			(fi.IsDir() && fi.Name() == "folder-to-skip")
 	}
 
-	fs = filter.New(fs, ignore)
+	fs = filter.Skip(fs, skip)
 
 	err := vfsutil.Walk(fs, "/", walk)
 	if err != nil {
