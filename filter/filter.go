@@ -33,6 +33,16 @@ func Skip(source http.FileSystem, skip Func) http.FileSystem {
 	return &filterFS{source: source, keep: keep}
 }
 
+// New returns a filesystem that contains everything in source, except entries
+// for which skip returns true.
+//
+// Deprecated: Use Skip instead, it does the same thing and has a better name.
+//
+// TODO: Remove this after a few days/weeks after migrating all users of old API to new API.
+func New(source http.FileSystem, skip Func) http.FileSystem {
+	return Skip(source, skip)
+}
+
 type filterFS struct {
 	source http.FileSystem
 	keep   Func // Keep entries that keep returns true for.
