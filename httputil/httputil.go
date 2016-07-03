@@ -4,16 +4,12 @@ package httputil
 import (
 	"log"
 	"net/http"
-	"time"
 )
 
-// TODO: Decide if this is a good idea/direction to go in.
-
-// FileHandler is an http.Handler that serves the root of File.
+// FileHandler is an http.Handler that serves the root of File,
+// which is expected to be a normal file (not a directory).
 type FileHandler struct {
-	File        http.FileSystem
-	ContentType string
-	Name        string // If ContentType is not set, file extension of Name is used to determine content type.
+	File http.FileSystem
 }
 
 func (h FileHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -24,8 +20,11 @@ func (h FileHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	defer f.Close()
-	if h.ContentType != "" {
-		w.Header().Set("Content-Type", h.ContentType)
+	fi, err := f.Stat()
+	if err != nil {
+		log.Printf("FileHandler.File.Stat('/'): %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	http.ServeContent(w, req, h.Name, time.Now(), f)
+	http.ServeContent(w, req, fi.Name(), fi.ModTime(), f)
 }
