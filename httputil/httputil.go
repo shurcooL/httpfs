@@ -4,6 +4,8 @@ package httputil
 import (
 	"log"
 	"net/http"
+
+	"github.com/shurcooL/httpgzip"
 )
 
 // FileHandler is an http.Handler that serves the root of File,
@@ -26,5 +28,5 @@ func (h FileHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.ServeContent(w, req, fi.Name(), fi.ModTime(), f)
+	httpgzip.ServeContent(w, req, fi.Name(), fi.ModTime(), f)
 }
