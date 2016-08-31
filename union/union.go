@@ -106,7 +106,7 @@ type dir struct {
 }
 
 func (d *dir) Seek(offset int64, whence int) (int64, error) {
-	if offset == 0 && whence == os.SEEK_SET {
+	if offset == 0 && whence == io.SeekStart {
 		d.pos = 0
 		return 0, nil
 	}
