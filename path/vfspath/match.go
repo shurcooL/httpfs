@@ -90,11 +90,11 @@ func glob(fs http.FileSystem, dir, pattern string, matches []string) (m []string
 	return
 }
 
-// hasMeta returns true if path contains any of the magic characters
+// hasMeta reports whether path contains any of the magic characters
 // recognized by Match.
 func hasMeta(path string) bool {
 	// TODO(niemeyer): Should other magic characters be added here?
-	return strings.IndexAny(path, "*?[") >= 0
+	return strings.ContainsAny(path, "*?[")
 }
 
 // byName implements sort.Interface.
