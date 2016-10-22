@@ -92,7 +92,7 @@ func WalkFiles(fs http.FileSystem, root string, walkFn WalkFilesFunc) error {
 }
 
 // walkFiles recursively descends path, calling walkFn.
-// It's responsible for closing the input file.
+// It closes the input file after it's done with it, so the caller shouldn't.
 func walkFiles(fs http.FileSystem, path string, info os.FileInfo, file vfs.ReadSeekCloser, walkFn WalkFilesFunc) error {
 	err := walkFn(path, info, file, nil)
 	file.Close()
@@ -121,6 +121,7 @@ func walkFiles(fs http.FileSystem, path string, info os.FileInfo, file vfs.ReadS
 			}
 		} else {
 			err = walkFiles(fs, filename, fileInfo, file, walkFn)
+			// file is closed by walkFiles, so we don't need to close it here.
 			if err != nil {
 				if !fileInfo.IsDir() || err != filepath.SkipDir {
 					return err
