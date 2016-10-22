@@ -76,7 +76,7 @@ func walk(fs http.FileSystem, path string, info os.FileInfo, walkFn filepath.Wal
 	return nil
 }
 
-// WalkFilesFunc is the type of the function called for each file or directory visited by Walk.
+// WalkFilesFunc is the type of the function called for each file or directory visited by WalkFiles.
 // It's like filepath.WalkFunc, except it provides an additional ReadSeeker parameter for file being visited.
 type WalkFilesFunc func(path string, info os.FileInfo, rs io.ReadSeeker, err error) error
 
@@ -129,4 +129,19 @@ func walkFiles(fs http.FileSystem, path string, info os.FileInfo, file vfs.ReadS
 		}
 	}
 	return nil
+}
+
+// openStat performs Open and Stat and returns results, or first error encountered.
+// The caller is responsible for closing the returned file when done.
+func openStat(fs http.FileSystem, name string) (http.File, os.FileInfo, error) {
+	f, err := fs.Open(name)
+	if err != nil {
+		return nil, nil, err
+	}
+	fi, err := f.Stat()
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	return f, fi, nil
 }
