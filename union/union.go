@@ -4,25 +4,20 @@ package union
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/shurcooL/httpfs/vfsutil"
 )
 
 // New creates an union filesystem with the provided mapping of mount points to filesystems.
-// For each mounted filesystem, it first does a stat of "/" to ensure it exists and to get its mod time.
 //
 // Each mount point must be of form "/mydir". It must start with a '/', and contain a single directory name.
 func New(mapping map[string]http.FileSystem) http.FileSystem {
 	u := &unionFS{
 		ns: make(map[string]http.FileSystem),
 		root: &dirInfo{
-			name:    "/",
-			modTime: time.Time{}, // An empty union filesystem has never been modified.
+			name: "/",
 		},
 	}
 	for mountPoint, fs := range mapping {
@@ -36,27 +31,13 @@ type unionFS struct {
 	root *dirInfo
 }
 
-// bind mounts fs at mountPoint, first doing a stat of "/" to ensure it exists and to get its mod time.
+// bind mounts fs at mountPoint.
 // mountPoint must be of form "/mydir". It must start with a '/', and contain a single directory name.
 func (u *unionFS) bind(mountPoint string, fs http.FileSystem) {
-	// THINK: I assumed doing a stat of "/" in fs is a very fast operation, but what if it isn't?
-	//        Maybe shouldn't do it, rather trust caller to do it if needed. Consider what to do
-	//        about mod time, either drop it or do it lazily.
-	fi, err := vfsutil.Stat(fs, "/")
-	if err != nil {
-		log.Fatalln("can't stat root directory of provided filesystem:", err)
-	}
-	modTime := fi.ModTime()
-
 	u.ns[mountPoint] = fs
 	u.root.entries = append(u.root.entries, &dirInfo{
-		name:    mountPoint[1:],
-		modTime: modTime,
+		name: mountPoint[1:],
 	})
-
-	if modTime.After(u.root.modTime) {
-		u.root.modTime = modTime
-	}
 }
 
 // Open opens the named file.
@@ -82,7 +63,6 @@ func (u *unionFS) Open(path string) (http.File, error) {
 // dirInfo is a static definition of a directory.
 type dirInfo struct {
 	name    string
-	modTime time.Time
 	entries []os.FileInfo
 }
 
@@ -95,7 +75,7 @@ func (d *dirInfo) Stat() (os.FileInfo, error) { return d, nil }
 func (d *dirInfo) Name() string       { return d.name }
 func (d *dirInfo) Size() int64        { return 0 }
 func (d *dirInfo) Mode() os.FileMode  { return 0755 | os.ModeDir }
-func (d *dirInfo) ModTime() time.Time { return d.modTime }
+func (d *dirInfo) ModTime() time.Time { return time.Time{} } // Actual mod time is not computed because it's expensive and rarely needed.
 func (d *dirInfo) IsDir() bool        { return true }
 func (d *dirInfo) Sys() interface{}   { return nil }
 
