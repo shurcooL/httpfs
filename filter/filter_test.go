@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	pathpkg "path"
+	"strings"
 
 	"github.com/shurcooL/httpfs/filter"
 	"github.com/shurcooL/httpfs/vfsutil"
@@ -13,17 +15,33 @@ import (
 	"golang.org/x/tools/godoc/vfs/mapfs"
 )
 
-func Example() {
-	walk := func(path string, fi os.FileInfo, err error) error {
-		if err != nil {
-			log.Printf("can't stat file %s: %v\n", path, err)
-			return nil
-		}
-		fmt.Println(path)
-		return nil
-	}
+func ExampleKeep() {
+	var srcFS http.FileSystem
 
-	fs := httpfs.New(mapfs.New(map[string]string{
+	// Keep only "/target/dir" and its contents.
+	fs := filter.Keep(srcFS, func(path string, fi os.FileInfo) bool {
+		return path == "/" ||
+			path == "/target" ||
+			path == "/target/dir" ||
+			strings.HasPrefix(path, "/target/dir/")
+	})
+
+	_ = fs
+}
+
+func ExampleSkip() {
+	var srcFS http.FileSystem
+
+	// Skip all files named ".DS_Store".
+	fs := filter.Skip(srcFS, func(path string, fi os.FileInfo) bool {
+		return !fi.IsDir() && fi.Name() == ".DS_Store"
+	})
+
+	_ = fs
+}
+
+func Example_detailed() {
+	srcFS := httpfs.New(mapfs.New(map[string]string{
 		"zzz-last-file.txt":                "It should be visited last.",
 		"a-file.txt":                       "It has stuff.",
 		"another-file.txt":                 "Also stuff.",
@@ -38,14 +56,19 @@ func Example() {
 
 	// Skip files with .go and .html extensions, and directories named "folder-to-skip" (but
 	// not files named "folder-to-skip").
-	skip := func(_ string, fi os.FileInfo) bool {
+	fs := filter.Skip(srcFS, func(path string, fi os.FileInfo) bool {
 		return pathpkg.Ext(fi.Name()) == ".go" || pathpkg.Ext(fi.Name()) == ".html" ||
 			(fi.IsDir() && fi.Name() == "folder-to-skip")
-	}
+	})
 
-	fs = filter.Skip(fs, skip)
-
-	err := vfsutil.Walk(fs, "/", walk)
+	err := vfsutil.Walk(fs, "/", func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			log.Printf("can't stat file %s: %v\n", path, err)
+			return nil
+		}
+		fmt.Println(path)
+		return nil
+	})
 	if err != nil {
 		panic(err)
 	}
