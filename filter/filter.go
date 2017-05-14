@@ -11,8 +11,10 @@ import (
 )
 
 // Func is a selection function which is provided two arguments,
-// its '/'-separated rooted absolute path (i.e., it always begins with "/"),
+// its '/'-separated cleaned rooted absolute path (i.e., it always begins with "/"),
 // and the os.FileInfo of the considered file.
+//
+// The path is cleaned via pathpkg.Clean("/" + path).
 //
 // For example, if the considered file is named "a" and it's inside a directory "dir",
 // then the value of path will be "/dir/a".
