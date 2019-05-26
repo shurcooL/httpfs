@@ -15,7 +15,7 @@ func ReadDir(fs http.FileSystem, name string) ([]os.FileInfo, error) {
 		return nil, err
 	}
 	defer f.Close()
-	return f.Readdir(0)
+	return f.Readdir(-1)
 }
 
 // Stat returns the FileInfo structure describing file.
