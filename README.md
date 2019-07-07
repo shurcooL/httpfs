@@ -21,6 +21,7 @@ Directories
 | [html/vfstemplate](https://godoc.org/github.com/shurcooL/httpfs/html/vfstemplate) | Package vfstemplate offers html/template helpers that use http.FileSystem.                                 |
 | [httputil](https://godoc.org/github.com/shurcooL/httpfs/httputil)                 | Package httputil implements HTTP utility functions for http.FileSystem.                                    |
 | [path/vfspath](https://godoc.org/github.com/shurcooL/httpfs/path/vfspath)         | Package vfspath implements utility routines for manipulating virtual file system paths.                    |
+| [text/vfstemplate](https://godoc.org/github.com/shurcooL/httpfs/text/vfstemplate) | Package vfstemplate offers text/template helpers that use http.FileSystem.                                 |
 | [union](https://godoc.org/github.com/shurcooL/httpfs/union)                       | Package union offers a simple http.FileSystem that can unify multiple filesystems at various mount points. |
 | [vfsutil](https://godoc.org/github.com/shurcooL/httpfs/vfsutil)                   | Package vfsutil implements some I/O utility functions for http.FileSystem.                                 |
 
