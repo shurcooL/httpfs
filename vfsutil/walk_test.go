@@ -3,7 +3,6 @@ package vfsutil_test
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -62,7 +61,7 @@ func ExampleWalkFiles() {
 		}
 		fmt.Println(path)
 		if !fi.IsDir() {
-			b, err := ioutil.ReadAll(r)
+			b, err := io.ReadAll(r)
 			if err != nil {
 				log.Printf("can't read file %s: %v\n", path, err)
 				return nil
